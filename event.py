@@ -29,6 +29,7 @@ def get_service():
 
     SCOPES = ["https://www.googleapis.com/auth/calendar"]
 
+    creds = None
     # The file token.json stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
     # time.
@@ -68,7 +69,6 @@ def create_event(service, deets):
         },
         "id": str(uuid.uuid5(uuid.NAMESPACE_DNS, title + starttime + endtime)).replace("-", ""),
     }
-
     event = service.events().insert(calendarId=json.load(open("cal.json"))["calendarId"], body=event).execute()
 
 
@@ -84,6 +84,7 @@ def main():
     events_created = 0
 
     for i in range(MAX_PAGES + 1):
+        print("On page", i + 1)
         q = requests.get(MAIN_WWW + "/events/?page=%i" % i).text
         web = BeautifulSoup(q, "html.parser")
 
@@ -117,7 +118,8 @@ def main():
                 create_event(service, event)
                 print("Event created:", event[0])
                 events_created += 1
-            except googleapiclient.errors.HttpError:
+            except googleapiclient.errors.HttpError as e:
+                print(e)
                 print("Duplicate event found. Skipping...")
                 pass
 
