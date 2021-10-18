@@ -9,6 +9,7 @@ from google.oauth2.credentials import Credentials
 import googleapiclient.errors
 import json, uuid
 from astropy.time import Time
+from colorama import Fore, Style
 
 
 def date2utc(txt):
@@ -67,6 +68,7 @@ def create_event(service, deets):
         "reminders": {
             "useDefault": True,
         },
+        # this creates a unique id for each event so as to make sure we don't get duplicate events
         "id": str(uuid.uuid5(uuid.NAMESPACE_DNS, title + starttime + endtime)).replace("-", ""),
     }
     event = service.events().insert(calendarId=json.load(open("cal.json"))["calendarId"], body=event).execute()
@@ -82,14 +84,13 @@ def main():
     MAX_PAGES = int(web.find("li", {"class": "pager__item pager__item--last"}).find("a").get("href").split("=")[-1])
 
     events_created = 0
-
+    total_events = 0
     for i in range(MAX_PAGES + 1):
         print("On page", i + 1)
         q = requests.get(MAIN_WWW + "/events/?page=%i" % i).text
         web = BeautifulSoup(q, "html.parser")
 
         info = web.find_all("h3", {"class": "events-title"})
-        dates = web.find_all("div", {"class": "event-date"})
         times = web.find_all("time")
         loc = web.find_all("div", {"class": "metainfo"})
         loc = list(map(lambda x: x.text.split("\n")[-1].lstrip(" ").rstrip(" "), loc))
@@ -111,19 +112,22 @@ def main():
         starttimes, endtimes = list(zip(*event_str))
         # transpose to get a list of each element per event
         events = list(zip(*[titles, loc, starttimes, endtimes, links]))
+        total_events += len(events)
 
         service = get_service()
         for event in events:
             try:
                 create_event(service, event)
-                print("Event created:", event[0])
+                print(f"{Fore.GREEN}Event created: {event[0]}{Style.RESET_ALL}")
                 events_created += 1
             except googleapiclient.errors.HttpError as e:
-                print(e)
-                print("Duplicate event found. Skipping...")
-                pass
+                if e.status_code == 409:
+                    print(f"{Fore.LIGHTBLACK_EX}Duplicate event found. Skipping...{Style.RESET_ALL}")
+                else:
+                    raise e
 
-    print("%i events created! Final date is %s" % (events_created, Time(events[-1][-3]).strftime("%Y-%m-%d %H:%M:%S")))
+    print("%i event%s created!" % (events_created, "s" if events_created != 1 else ""))
+    print(f"Total events: {Fore.GREEN}%i{Style.RESET_ALL}" % len(total_events))
 
 
 if __name__ == "__main__":
