@@ -127,7 +127,7 @@ def main():
                     raise e
 
     print("%i event%s created!" % (events_created, "s" if events_created != 1 else ""))
-    print(f"Total events: {Fore.GREEN}%i{Style.RESET_ALL}" % len(total_events))
+    print(f"Total events: {Fore.GREEN}%i{Style.RESET_ALL}" % (total_events))
 
 
 if __name__ == "__main__":
