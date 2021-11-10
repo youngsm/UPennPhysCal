@@ -1,5 +1,5 @@
 # UPennPhysCal
-A nasty but easy way to keep your GCal updated with department colloquia
+A nasty but easy way to keep your GCal updated with department colloquia. Depends on `bs4`, `colorama`, `and google-api-python-client`.
 
 You will need to create an Oauth2 credential in Google Cloud to let the script edit your calendar, which can be done by visiting [creating a project](https://developers.google.com/workspace/guides/create-project), enabling the Google Calendar API, and creating credentials for a Desktop Application. Make sure your scope in your credential includes `https://www.googleapis.com/auth/calendar`.
 
