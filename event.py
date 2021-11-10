@@ -8,8 +8,14 @@ from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 import googleapiclient.errors
 import json, uuid
-from astropy.time import Time
 from colorama import Fore, Style
+
+
+# get directory of this file
+loc = os.path.dirname(os.path.realpath(__file__))
+TOKEN_PATH = os.path.join(loc, "token.json")
+CREDENTIALS_PATH = os.path.join(loc, "credentials.json")
+CAL_PATH = os.path.join(loc, "cal.json")
 
 
 def date2utc(txt):
@@ -34,17 +40,18 @@ def get_service():
     # The file token.json stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
     # time.
-    if os.path.exists("token.json"):
-        creds = Credentials.from_authorized_user_file("token.json", SCOPES)
+
+    if os.path.exists(TOKEN_PATH):
+        creds = Credentials.from_authorized_user_file(TOKEN_PATH, SCOPES)
     # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
+            flow = InstalledAppFlow.from_client_secrets_file(CREDENTIALS_PATH, SCOPES)
             creds = flow.run_local_server(port=0)
         # Save the credentials for the next run
-        with open("token.json", "w") as token:
+        with open(TOKEN_PATH, "w") as token:
             token.write(creds.to_json())
 
     return build("calendar", "v3", credentials=creds)
@@ -71,7 +78,7 @@ def create_event(service, deets):
         # this creates a unique id for each event so as to make sure we don't get duplicate events
         "id": str(uuid.uuid5(uuid.NAMESPACE_DNS, title + starttime + endtime)).replace("-", ""),
     }
-    event = service.events().insert(calendarId=json.load(open("cal.json"))["calendarId"], body=event).execute()
+    event = service.events().insert(calendarId=json.load(open(CAL_PATH))["calendarId"], body=event).execute()
 
 
 def main():
