@@ -1,4 +1,4 @@
-import requests
+import requests, json, uuid
 import os.path
 from bs4 import BeautifulSoup
 from datetime import datetime
@@ -7,11 +7,9 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 import googleapiclient.errors
-import json, uuid
 from colorama import Fore, Style
 
 
-# get directory of this file
 loc = os.path.dirname(os.path.realpath(__file__))
 TOKEN_PATH = os.path.join(loc, "token.json")
 CREDENTIALS_PATH = os.path.join(loc, "credentials.json")
@@ -88,10 +86,14 @@ def main():
     q = requests.get(MAIN_WWW + "/events/").text
 
     web = BeautifulSoup(q, "html.parser")
-    MAX_PAGES = int(web.find("li", {"class": "pager__item pager__item--last"}).find("a").get("href").split("=")[-1])
+    try:
+        MAX_PAGES = int(web.find("li", {"class": "pager__item pager__item--last"}).find("a").get("href").split("=")[-1])
+    except:
+        MAX_PAGES = 0
 
     events_created = 0
     total_events = 0
+    service = get_service()
     for i in range(MAX_PAGES + 1):
         print("On page", i + 1)
         q = requests.get(MAIN_WWW + "/events/?page=%i" % i).text
@@ -121,7 +123,6 @@ def main():
         events = list(zip(*[titles, loc, starttimes, endtimes, links]))
         total_events += len(events)
 
-        service = get_service()
         for event in events:
             try:
                 create_event(service, event)
