@@ -13,7 +13,7 @@ To connect your Oauth2 credential to your computer download `credentials.json`. 
 
 Or, alternatively, if you'd like to add to your main calendar, set `calendarId` to `main`.
 
-Then, run events.py, give calendar access to your program, and watch as all events are added to your calendar.
+Then, run events.py, give calendar access to your program, and sit still for a bit while events are added.
 
 ### Example
 
