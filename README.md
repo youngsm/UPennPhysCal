@@ -1,5 +1,13 @@
 # UPennPhysCal
+
+
 A nasty but easy way to keep your GCal updated with department colloquia. Depends on `bs4`, `colorama`, and `google-api-python-client`.
+
+### The Calendar
+
+I have this script run once a day, adding events to a UPenn Physics Events calendar. You can add it to your own calendar by clicking the "+" icon in the bottom right of [this](https://calendar.google.com/calendar/u/0/embed?height=600&wkst=1&bgcolor=%23ffffff&ctz=America/New_York&showPrint=0&showDate=1&mode=MONTH&src=c2YxcG41a2tqcmlmbDg5N2M0YzlmYXA1M2tAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ&color=%23cc7c75) page.
+
+### Usage
 
 You will need to create an Oauth2 credential in Google Cloud to let the script edit your calendar, which can be done by visiting [creating a project](https://developers.google.com/workspace/guides/create-project), enabling the Google Calendar API, and creating credentials for a Desktop Application. Make sure your scope in your credential includes `https://www.googleapis.com/auth/calendar`.
 
