@@ -1,0 +1,23 @@
+name: Google Calendar Import
+on:
+  schedule:
+  - cron: '1 0 * * *'
+  # You may pin to the exact commit or the version.
+  # uses: maxogden/google-calendar-import@b472d2135726814062a36804ca7db83010607be7
+jobs:
+  gcalimport:
+    runs-on: ubuntu-latest
+    steps:
+    - name: GCal Import
+      uses: maxogden/google-calendar-import@v1.1.1
+      with:
+        # string, contents of credentials.json
+        google-credentials: ${{ secrets.GOOGLE_CREDENTIALS }}
+        # string, contents of token.json
+        google-token: ${{ secrets.GOOGLE_TOKEN }}
+        # string, the calendar id to check
+        calendar-id: ${{ secrets.CALENDAR_ID }}
+        # string, path of the json file in the repo to read/write
+        json-path: ${{ secrets.JSON_PATH }}
+        # string, github env var for repo token
+        repo-token: ${{ secrets.GIT_TOKEN }}
